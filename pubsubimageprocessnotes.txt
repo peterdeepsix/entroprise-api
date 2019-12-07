@@ -1,0 +1,37 @@
+### PUB/SUB ###
+
+gcloud builds submit --tag gcr.io/plexus-1d216/pubsub
+
+gcloud run deploy pubsub-tutorial --image gcr.io/plexus-1d216/pubsub
+
+gcloud projects add-iam-policy-binding plexus-1d216 \
+     --member=serviceAccount:service-602861693791@gcp-sa-pubsub.iam.gserviceaccount.com \
+     --role=roles/iam.serviceAccountTokenCreator
+
+     gcloud iam service-accounts create cloud-run-pubsub-invoker \
+     --display-name "Cloud Run Pub/Sub Invoker"
+
+     gcloud run services add-iam-policy-binding pubsub-tutorial \
+   --member=serviceAccount:cloud-run-pubsub-invoker@plexus-1d216.iam.gserviceaccount.com \
+   --role=roles/run.invoker
+
+   gcloud pubsub subscriptions create myRunSubscription --topic myRunTopic \
+   --push-endpoint=https://pubsub-tutorial-ytzdeigeja-uc.a.run.app/ \
+   --push-auth-service-account=cloud-run-pubsub-invoker@plexus-1d216.iam.gserviceaccount.com
+
+
+
+
+
+
+### IMAGE PROCESSING ###
+
+git clone https://github.com/GoogleCloudPlatform/nodejs-docs-samples.git
+
+cd nodejs-docs-samples/run/image-processing/
+
+gcloud builds submit --tag gcr.io/plexus-1d216/pubsub
+
+gcloud run deploy pubsub-tutorial --image gcr.io/plexus-1d216/pubsub --set-env-vars=BLURRED_BUCKET_NAME=plexus-predictions-blurred
+
+gsutil notification create -t myRunTopic -f json gs://plexus-predictions-up
