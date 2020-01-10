@@ -19,6 +19,6 @@ steps:
           "--platform=managed",
           "--allow-unauthenticated",
           "--set-env-vars=BLURRED_BUCKET_NAME=<BLURRED_BUCKET_NAME>"
-          ]
+        ]
   images:
     - gcr.io/$PROJECT_ID/plexus-prediction-service
