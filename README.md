@@ -4,15 +4,44 @@ This sample service applies [Cloud Storage](https://cloud.google.com/storage/doc
 
 Use it with the [Image Processing with Cloud Run tutorial](http://cloud.google.com/run/docs/tutorials/image-processing).
 
-For more details on how to work with this sample read the [Google Cloud Run Node.js Samples README](https://github.com/GoogleCloudPlatform/nodejs-docs-samples/tree/master/run).
+[![Run in Google Cloud][run_img]][run_link]
 
-## Dependencies
+[run_img]: https://storage.googleapis.com/cloudrun/button.svg
+[run_link]: https://deploy.cloud.run/?git_repo=https://github.com/GoogleCloudPlatform/python-docs-samples&dir=run/image-processing
 
-* **express**: Web server framework
-* **body-parser**: express middleware for request payload processing
-* **[gm](https://github.com/aheckmann/gm#readme)**: ImageMagick integration library.
-* **@google-cloud/storage**: Google Cloud Storage client library.
-* **@google-cloud/vision**: Cloud Vision API client library.
+## Build
+
+```
+docker build --tag pubsub-tutorial:python .
+```
+
+## Run Locally
+
+```
+docker run --rm -p 9090:8080 pubsub-tutorial:python
+```
+
+## Test
+
+```
+pytest
+```
+
+_Note: you may need to install `pytest` using `pip install pytest`._
+
+## Deploy
+
+```
+# Set an environment variable with your GCP Project ID
+export GOOGLE_CLOUD_PROJECT=<PROJECT_ID>
+
+# Submit a build using Google Cloud Build
+gcloud builds submit --tag gcr.io/${GOOGLE_CLOUD_PROJECT}/pubsub-tutorial
+
+# Deploy to Cloud Run
+gcloud beta run deploy pubsub-tutorial --image gcr.io/${GOOGLE_CLOUD_PROJECT}/pubsub-tutorial --set-env-vars=BLURRED_BUCKET_NAME=<BLURRED_BUCKET_NAME>
+
+```
 
 ## Environment Variables
 
@@ -24,12 +53,6 @@ Required variables for this sample include:
 
 ## Maintenance Note
 
-* The `image.js` file is copied from the [Cloud Functions ImageMagick sample `index.js`](../../functions/imagemagick/index.js). Region tags are changed.
-* The package.json dependencies used in the copied code should track the [Cloud Functions ImageMagick `package.json`](../../functions/imagemagick/package.json)
+* The `image.py` file is copied from the [Cloud Functions ImageMagick sample `main.py`](../../functions/imagemagick/main.py). Region tags are changed.
+* The requirements.txt dependencies used in the copied code should track the [Cloud Functions ImageMagick `requirements.txt`](../../functions/imagemagick/requirements.txt)
 
-```sh
-cp ../../functions/imagemagick/index.js image.js
-sed -i '' 's/functions_imagemagick_setup/run_imageproc_handler_setup/' image.js
-sed -i '' 's/functions_imagemagick_analyze/run_imageproc_handler_analyze/' image.js
-sed -i '' 's/functions_imagemagick_blur/run_imageproc_handler_blur/' image.js
-```
