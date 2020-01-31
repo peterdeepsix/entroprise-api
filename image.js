@@ -1,17 +1,3 @@
-// Copyright 2017 Google LLC
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 "use strict";
 
 // [START run_imageproc_handler_setup]
@@ -40,11 +26,11 @@ exports.blurOffensiveImages = async event => {
   console.log(`Analyzing ${file.name}.`);
 
   try {
-    const [result] = await client.safeSearchDetection(filePath);
+    const [result] = await client.labelDetection(filePath);
     const detections = result.safeSearchAnnotation || {};
-
+    console.log(results);
     if (
-      // Levels are defined in https://cloud.google.com/vision/docs/reference/rest/v1/AnnotateImageResponse#likelihood
+      // https://cloud.google.com/vision/docs/reference/rest/v1/AnnotateImageResponse#likelihood
       detections.adult === "VERY_LIKELY" ||
       detections.violence === "VERY_LIKELY"
     ) {
