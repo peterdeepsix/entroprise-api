@@ -38,7 +38,7 @@ app.post("/", async (req, res) => {
     const msg =
       "Invalid Pub/Sub message: data property is not valid base64 encoded JSON";
     console.error(`error: ${msg}: ${err}`);
-    console.error(`req.body.message: ${req.body.message}`);
+    console.error(`req.body.message: ${req}`);
     res.status(400).send(`Bad Request: ${msg}`);
     return;
   }
