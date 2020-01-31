@@ -1,6 +1,5 @@
 "use strict";
 
-// [START run_imageproc_handler_setup]
 const gm = require("gm").subClass({ imageMagick: true });
 const fs = require("fs");
 const { promisify } = require("util");
@@ -26,23 +25,14 @@ exports.blurOffensiveImages = async event => {
 
   const document = firestore.doc("objects/ATOydUhabB4THiVsYauw");
   let doc = await document.get();
-  console.log(`doc -  ${doc}.`);
+  console.log(`doc -  ${doc.title}.`);
 
   try {
     const [result] = await client.webDetection(filePath);
     const detections = result.webEntities || {};
     console.log(detections);
-    if (
-      // https://cloud.google.com/vision/docs/reference/rest/v1/AnnotateImageResponse#likelihood
-      detections.adult === "VERY_LIKELY" ||
-      detections.violence === "VERY_LIKELY"
-    ) {
-      console.log(`Detected ${file.name} as inappropriate.`);
-      return blurImage(file, BLURRED_BUCKET_NAME);
-    } else {
-      console.log(`Detected ${file.name} as OK.`);
-      return blurImage(file, BLURRED_BUCKET_NAME);
-    }
+    console.log(`Detected ${file.name} as OK.`);
+    return blurImage(file, BLURRED_BUCKET_NAME);
   } catch (err) {
     console.error(`Failed to analyze ${file.name}.`, err);
     throw err;
