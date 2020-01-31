@@ -6,13 +6,10 @@ gcloud iam service-accounts create cloud-run-pubsub-invoker --display-name "Clou
 
 gcloud run services add-iam-policy-binding plexus-prediction-service-master --member=serviceAccount:cloud-run-pubsub-invoker@plexus-1d216.iam.gserviceaccount.com --role=roles/run.invoker
 
-   gcloud pubsub subscriptions create myRunSubscription --topic myRunTopic \
-   --push-endpoint=https://pubsub-tutorial-ytzdeigeja-uc.a.run.app/ \
-   --push-auth-service-account=cloud-run-pubsub-invoker@plexus-1d216.iam.gserviceaccount.com
+gcloud pubsub subscriptions create myRunSubscription --topic myRunTopic --push-endpoint=https://plexus-prediction-service-master-awrg75z5la-uc.a.run.app/ --push-auth-service-account=cloud-run-pubsub-invoker@plexus-1d216.iam.gserviceaccount.com
 
 
-
-
+gsutil notification create -t myRunTopic -f json gs://deepsixdesign-web-prod-media-upload
 
 
 ### IMAGE PROCESSING ###
