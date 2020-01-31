@@ -6,12 +6,15 @@ const fs = require("fs");
 const { promisify } = require("util");
 const path = require("path");
 const vision = require("@google-cloud/vision");
+const { Firestore } = require("@google-cloud/firestore");
 
 const { Storage } = require("@google-cloud/storage");
 const storage = new Storage();
 const client = new vision.ImageAnnotatorClient();
 
 const { BLURRED_BUCKET_NAME } = process.env;
+
+const firestore = new Firestore();
 
 exports.blurOffensiveImages = async event => {
   const object = event;
@@ -20,6 +23,10 @@ exports.blurOffensiveImages = async event => {
   const filePath = `gs://${object.bucket}/${object.name}`;
 
   console.log(`Analyzing ${file.name}.`);
+
+  const document = firestore.doc("objects/ATOydUhabB4THiVsYauw");
+  let doc = await document.get();
+  console.log(`doc -  ${doc}.`);
 
   try {
     const [result] = await client.webDetection(filePath);
