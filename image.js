@@ -29,8 +29,8 @@ exports.blurOffensiveImages = async event => {
 
   try {
     const [result] = await client.webDetection(filePath);
-    const detections = result.webEntities || {};
-    console.log(detections);
+    const detections = result.webEntities || [];
+    console.log(`detections[0].score ${detections[0].score}`);
     console.log(`Detected ${file.name} as OK.`);
     return blurImage(file, BLURRED_BUCKET_NAME);
   } catch (err) {
