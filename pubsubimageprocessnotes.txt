@@ -8,7 +8,6 @@ gcloud run services add-iam-policy-binding plexus-prediction-service-master --me
 
 gcloud pubsub subscriptions create myRunSubscription --topic myRunTopic --push-endpoint=https://plexus-prediction-service-master-awrg75z5la-uc.a.run.app/ --push-auth-service-account=cloud-run-pubsub-invoker@plexus-1d216.iam.gserviceaccount.com
 
-
 gsutil notification create -t myRunTopic -f json gs://deepsixdesign-web-prod-media-upload
 
 
@@ -18,7 +17,7 @@ git clone https://github.com/GoogleCloudPlatform/nodejs-docs-samples.git
 
 cd nodejs-docs-samples/run/image-processing/
 
-gcloud builds submit --tag gcr.io/plexus-1d216/pubsub
+gcloud builds submit --tag gcr.io/deepsixdesign-web-prod/pubsub
 
 gcloud run deploy pubsub-tutorial --image gcr.io/plexus-1d216/pubsub --set-env-vars=BLURRED_BUCKET_NAME=plexus-predictions-blurred
 
