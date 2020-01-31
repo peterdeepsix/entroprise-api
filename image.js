@@ -20,17 +20,15 @@ exports.blurOffensiveImages = async event => {
 
   const file = storage.bucket(object.bucket).file(object.name);
   const filePath = `gs://${object.bucket}/${object.name}`;
-
   console.log(`Analyzing ${file.name}.`);
 
   const document = firestore.doc("objects/ATOydUhabB4THiVsYauw");
   let doc = await document.get();
-  console.log(`doc -  ${doc.title}.`);
 
   try {
     const [result] = await client.webDetection(filePath);
     const detections = result.webEntities || [];
-    console.log(`detections[0].score ${detections[0].score}`);
+    console.log(`detections ${detections}`);
     console.log(`Detected ${file.name} as OK.`);
     return blurImage(file, BLURRED_BUCKET_NAME);
   } catch (err) {
