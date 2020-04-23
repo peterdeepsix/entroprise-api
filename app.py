@@ -5,6 +5,9 @@ import os
 from flask import Flask, request, jsonify
 from firebase_admin import firestore, initialize_app
 
+import ktrain
+from ktrain import text
+
 # Initialize Flask app
 app = Flask(__name__)
 
