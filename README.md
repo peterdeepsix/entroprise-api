@@ -1,10 +1,16 @@
 # flask app with ktrain and BERT
 
+# git
+git config --global user.email "peter@deepsixdesign.com"
+git config --global user.name "Peter Arnold"
+
 # create venv on windows
 
 py -m venv venv
 
 # activate on windows
+
+Set-ExecutionPolicy Unrestricted -Force
 
 .\venv\Scripts\activate
 
