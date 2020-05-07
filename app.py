@@ -5,6 +5,7 @@ import os
 from flask import Flask, request, jsonify
 from firebase_admin import firestore, initialize_app
 import comparison
+import numpy as np
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -44,15 +45,14 @@ def createAnswer():
         else:
             question = col_ref.document(qid).get()
             answersCol = col_ref.document(qid).collection("correct_answers")
-            answers = [a.to_dict() for a in answersCol.stream()]
+            answers = [a.to_dict()['answer'] for a in answersCol.stream()]
             correct = comparison.findSimilarity(answers, aid)
         # determine whether the answer is correct or not
-        if correct:
+        if correct > comparison.confidenceThreshold:
             col_ref.document(qid).collection('correct_answers').document(aid).set(request.json)
-            return jsonify({"correct": True}), 200
         else:
             col_ref.document(qid).collection('incorrect_answers').document(aid).set(request.json)
-            return jsonify({"correct": False}), 200
+        return jsonify({"correct": correct}), 200
     except Exception as e:
         return f"An Error Occurred: {e}"
 

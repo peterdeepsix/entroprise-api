@@ -18,7 +18,9 @@ Set-ExecutionPolicy Unrestricted -Force
 
 deactivate
 
-# install deps
+# upgrade pip then install deps
+
+python -m pip install --upgrade pip
 
 pip install -r requirements.txt
 

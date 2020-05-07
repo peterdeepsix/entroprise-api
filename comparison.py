@@ -53,10 +53,12 @@ def createTensor(teacherQuestion, teacherAnswer, studentAnswer, sourceInfo):
     return inputArray
 
 
+confidenceThreshold = 0.5
+
 def findSimilarity(correctAnswers, newAnswer):
     # Setup a confidence threshold for calcs lbelow
     confidenceThreshold = 0.5
-    qAndArray = []
+    # qAndArray = []
 
     # Defining a class with a bunch of different ways to calculate the distance between two lists.
     class Similarity():
@@ -82,7 +84,6 @@ def findSimilarity(correctAnswers, newAnswer):
         def square_rooted(self,x):
             return np.round(sqrt(sum([a*a for a in x])),3)
 
-
     # Put all redundant answer encodings into an array
     def redundant_sent_idx(sim_matrix):
         dup_idx = [] 
@@ -92,23 +93,22 @@ def findSimilarity(correctAnswers, newAnswer):
                 dup_idx.extend(tmp)
         return dup_idx
 
-
     # Embed the input
-    encoding_matrix = embed(qAndArray)
+    # encoding_matrix = embed(qAndArray)
 
     # Get the index of the similar ones
-    dup_indexes = redundant_sent_idx(np.inner(encoding_matrix,encoding_matrix))
+    # dup_indexes = redundant_sent_idx(np.inner(encoding_matrix,encoding_matrix))
 
     # Return the value of the similar ones
-    similarAnswers = np.delete(np.array(qAndArray), dup_indexes)
+    # similarAnswers = np.delete(np.array(qAndArray), dup_indexes)
 
     # Print the similar answers
-    print('Similar Answers:', similarAnswers)
+    # print('Similar Answers:', similarAnswers)
 
     # Use a function from one of the classes to measure the distance between lists
-    measures = Similarity()
-    newMeasure = measures.cosine_similarity(encoding_matrix[0],encoding_matrix[2])
-    print(newMeasure)
+    # measures = Similarity()
+    # newMeasure = measures.cosine_similarity(encoding_matrix[0],encoding_matrix[2])
+    # print(newMeasure)
 
     # Correct Answers
     # correctAnswers = ['Cat', 'Dog', 'Horse']
@@ -116,19 +116,20 @@ def findSimilarity(correctAnswers, newAnswer):
 
     # Student Answers
     # newAnswer = ['Mouse']
-    newAnswerMatrix = embed(newAnswer)
+    newAnswerMatrix = embed([newAnswer])
 
     # Calc the loot
     sim_matrix  = np.inner(newAnswerMatrix, correctAnswersMatrix)
+    
 
     # Print the loot
     if sim_matrix.max() > confidenceThreshold:
-        print('Answer:', newAnswer[0])
-        print("This answer is correct.")
-        print('Max Confidence:', sim_matrix.max())
-        return 1
+        # print('Answer:', newAnswer[0])
+        # print("This answer is correct.")
+        # print('Max Confidence:', sim_matrix.max())
+        return float(sim_matrix.max())
     else:
-        print('Answer:', newAnswer[0])
-        print("This answer is NOT correct.")
-        print('Max Confidence Score:', sim_matrix.max())
-        return 0
+        # print('Answer:', newAnswer[0])
+        # print("This answer is NOT correct.")
+        # print('Max Confidence Score:', sim_matrix.max())
+        return float(sim_matrix.max())
