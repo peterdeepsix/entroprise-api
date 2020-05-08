@@ -24,8 +24,9 @@ def createQuestion():
         e.g. json={'question': 'What color is the sky?'}
     """
     try:
-        qid = request.json['question']
-        col_ref.document().set(request.json)
+        id = col_ref.document().id
+        question = request.json['question']
+        col_ref.document(id).set({"id": id, "question": request.json['question']})
         return jsonify({"success": True}), 200
     except Exception as e:
         return f"An Error Occurred: {e}"
@@ -38,20 +39,20 @@ def createAnswer():
         e.g. json={'question': 'What color is the sky?', 'answer': 'Blue', 'correct': True}
     """
     try:
-        qid = request.json['question']
-        aid = request.json['answer']
+        qid = request.json['id']
+        newAnswer = request.json['answer']
         if "correct" in request.json:
             correct = request.json['correct']
         else:
             question = col_ref.document(qid).get()
             answersCol = col_ref.document(qid).collection("correct_answers")
             answers = [a.to_dict()['answer'] for a in answersCol.stream()]
-            correct = comparison.findSimilarity(answers, aid)
+            correct = comparison.findSimilarity(answers, newAnswer)
         # determine whether the answer is correct or not
         if correct > comparison.confidenceThreshold:
-            col_ref.document(qid).collection('correct_answers').document(aid).set(request.json)
+            col_ref.document(qid).collection('correct_answers').document().set(request.json)
         else:
-            col_ref.document(qid).collection('incorrect_answers').document(aid).set(request.json)
+            col_ref.document(qid).collection('incorrect_answers').document().set(request.json)
         return jsonify({"correct": correct}), 200
     except Exception as e:
         return f"An Error Occurred: {e}"
@@ -66,7 +67,7 @@ def read():
     """
     try:
         # Check if ID was passed to URL query
-        qid = request.args.get('question')
+        qid = request.args.get('id')
         if qid:
             question = col_ref.document(qid).get()
             answersCol = col_ref.document(qid).collection("correct_answers")
@@ -89,8 +90,8 @@ def update():
         e.g. json={'id': '1', 'title': 'Write a blog post today'}
     """
     try:
-        id = request.json['foreign_key']
-        col_ref.document(id).update(request.json)
+        qid = request.json['id']
+        col_ref.document(qid).update(request.json)
         return jsonify({"success": True}), 200
     except Exception as e:
         return f"An Error Occurred: {e}"
@@ -116,7 +117,7 @@ def delete():
     """
     try:
         # Check for ID in URL query
-        qid = request.args.get('question')
+        qid = request.args.get('id')
         delete_collection(col_ref.document(qid).collection("correct_answers"), 10)
         delete_collection(col_ref.document(qid).collection("incorrect_answers"), 10)
         col_ref.document(qid).delete()

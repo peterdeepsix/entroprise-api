@@ -11,7 +11,7 @@ model = hub.load(module_url)
 def embed(input):
   return model(input)
 
-def createTensor(teacherQuestion, teacherAnswer, studentAnswer, sourceInfo):
+def smartComparison(teacherQuestion, teacherAnswer, studentAnswer, sourceInfo):
     # Define inputs - note: try words, sentences and paragraphs
     # teacherQuestion = 'What causes computer images to be too dark?'
     # teacherAnswer = 'Not all programs will do gamma correction while displaying.'
