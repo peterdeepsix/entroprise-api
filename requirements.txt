@@ -4,3 +4,4 @@ firebase_admin
 tensorflow
 tensorflow_hub
 numpy
+pandas
