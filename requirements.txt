@@ -5,3 +5,4 @@ tensorflow
 tensorflow_hub
 numpy
 pandas
+sklearn

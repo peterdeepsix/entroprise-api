@@ -133,3 +133,16 @@ def findSimilarity(correctAnswers, newAnswer):
         # print("This answer is NOT correct.")
         # print('Max Confidence Score:', sim_matrix.max())
         return float(sim_matrix.max())
+
+def testSmartComp():
+    from sklearn.datasets import fetch_20newsgroups
+    remove = ('headers', 'footers', 'quotes')
+    newsgroups_train = fetch_20newsgroups(subset='train', remove=remove)
+    newsgroups_test = fetch_20newsgroups(subset='test', remove=remove)
+    docs = newsgroups_train.data +  newsgroups_test.data
+    INDEXDIR = '/tmp/myindex'
+    text.SimpleQA.initialize_index(INDEXDIR)
+    text.SimpleQA.index_from_list(docs, INDEXDIR, commit_every=len(docs))
+    qa = text.SimpleQA(INDEXDIR)
+
+    smartComparison('What causes computer images to be too dark?', 'Not all programs will do gamma correction while displaying.', "A lack of gamma correction when displaying.", qa)
