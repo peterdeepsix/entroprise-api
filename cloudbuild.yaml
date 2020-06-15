@@ -1,40 +1,4 @@
 steps:
-  - name: gcr.io/cloud-builders/docker
-    id: "postgres_up"
-    args:
-      [
-        "run",
-        "-d",
-        "-e",
-        "POSTGRES_HOST_AUTH_METHOD=trust",
-        "-p",
-        "5432:5432",
-        "-v",
-        "/var/run/postgresql:/var/run/postgresql",
-        "--name=postgres",
-        "--network=cloudbuild",
-        "postgres",
-      ]
-
-  - name: jwilder/dockerize:0.6.1
-    id: "postgres_expose_wait"
-    args: ["dockerize", "-timeout=60s", "-wait=tcp://postgres:5432"]
-
-  - name: python:3.7
-    id: "python_install_config_test"
-    args:
-      - "sh"
-      - "-c"
-      - |
-        pip3 install -r requirements.txt \
-        && pytest tests -s --cov=. --cov-fail-under 100 --log-cli-level info
-    env:
-      - "PROJECT_ID=$PROJECT_ID"
-
-  - name: gcr.io/cloud-builders/docker
-    id: "postgres_down"
-    args: ["rm", "--force", "postgres"]
-
   - id: "docker_build"
     name: "gcr.io/cloud-builders/docker"
     args: ["build", "-t", "us.gcr.io/$PROJECT_ID/cloudrunfastapi", "."]
@@ -53,7 +17,7 @@ steps:
         "api-$BRANCH_NAME",
         "--image=us.gcr.io/$PROJECT_ID/api:latest",
         "--cpu=2",
-        "--port=8080",
+        "--port=80",
         "--memory=2048Mi",
         "--timeout=600",
         "--concurrency=20",
@@ -63,44 +27,33 @@ steps:
         "--allow-unauthenticated",
         "--revision-suffix=$SHORT_SHA",
         "--set-env-vars=PROJECT_ID=$PROJECT_ID,SHORT_SHA=$SHORT_SHA",
-        "--set-cloudsql-instances=$PROJECT_ID:us-central1:entroprise-db",
-        "--service-account=cloudrunsrvacct@service-22266004444@serverless-robot-prod.iam.gserviceaccount.com",
       ]
-
-  - id: "create google cloud infrastructure"
-    name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
-    args:
-      - sh
-      - -c
-      - |
-        echo "create domain name mapping ..."
-
-        gcloud beta run domain-mappings create \
-            --domain $_MY_DOMAIN \
-            --service api-master \
-            --platform managed \
-            --region us-central1 || true
-
-        echo "create google cloud scheduler job ..."
-
-        gcloud scheduler jobs create http ping \
-            --schedule="* * * * *" \
-            --uri="https://$_MY_DOMAIN/healthcheck" \
-            --http-method=GET || true
-
-        echo "create iam binding for pubsub ..."
-
-        gcloud projects add-iam-policy-binding $PROJECT_ID \
-            --member="serviceAccount:$_SERVICE_ACCOUNT_ADDRESS"\
-            --role='roles/iam.serviceAccountTokenCreator'
-
-        echo "creating topics and subscriptions ..."
-
-        gcloud pubsub topics create apipub || true
-
-        gcloud pubsub subscriptions create apisub \
-            --topic apipub \
-            --topic-project $PROJECT_ID \
-            --push-endpoint https://$_MY_DOMAIN/pubsub/receive_message \
-            --push-auth-service-account $_SERVICE_ACCOUNT_ADDRESS \
-            --expiration-period=never || true
+  # - id: "create google cloud infrastructure"
+  #   name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+  #   args:
+  #     - sh
+  #     - -c
+  #     - |
+  #       echo "create domain name mapping ..."
+  #       gcloud beta run domain-mappings create \
+  #           --domain $_MY_DOMAIN \
+  #           --service api-master \
+  #           --platform managed \
+  #           --region us-central1 || true
+  #       echo "create google cloud scheduler job ..."
+  #       gcloud scheduler jobs create http ping \
+  #           --schedule="* * * * *" \
+  #           --uri="https://$_MY_DOMAIN/healthcheck" \
+  #           --http-method=GET || true
+  #       echo "create iam binding for pubsub ..."
+  #       gcloud projects add-iam-policy-binding $PROJECT_ID \
+  #           --member="serviceAccount:$_SERVICE_ACCOUNT_ADDRESS"\
+  #           --role='roles/iam.serviceAccountTokenCreator'
+  #       echo "creating topics and subscriptions ..."
+  #       gcloud pubsub topics create apipub || true
+  #       gcloud pubsub subscriptions create apisub \
+  #           --topic apipub \
+  #           --topic-project $PROJECT_ID \
+  #           --push-endpoint https://$_MY_DOMAIN/pubsub/receive_message \
+  #           --push-auth-service-account $_SERVICE_ACCOUNT_ADDRESS \
+  #           --expiration-period=never || true

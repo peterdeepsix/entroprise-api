@@ -1,7 +1,0 @@
-[run]
-omit =
-    tests/*
-    alembic/*
-    env/*
-    *__init__.py
-    config.py

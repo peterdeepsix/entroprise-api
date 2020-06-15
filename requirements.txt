@@ -4,6 +4,7 @@ email-validator==1.0.5
 fastapi==0.47.1
 google-api-core==1.16.0
 google-cloud-core==1.2.0
+google-cloud-firestore==1.7.0
 google-cloud-pubsub==1.1.0
 google-cloud-secret-manager==0.1.1
 google-cloud-storage==1.25.0

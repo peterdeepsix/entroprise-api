@@ -132,3 +132,4 @@ dmypy.json
 keys/*.pem
 hosts/*
 !hosts/*.enc
+credentials-firebase.json
