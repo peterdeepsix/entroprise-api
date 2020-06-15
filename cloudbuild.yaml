@@ -63,44 +63,44 @@ steps:
         "--allow-unauthenticated",
         "--revision-suffix=$SHORT_SHA",
         "--set-env-vars=PROJECT_ID=$PROJECT_ID,SHORT_SHA=$SHORT_SHA",
-        "--set-cloudsql-instances=$PROJECT_ID:us-central1:cloudrunfastapi",
-        "--service-account=cloudrunsrvacct@$PROJECT_ID.iam.gserviceaccount.com"
+        "--set-cloudsql-instances=$PROJECT_ID:us-central1:entroprise-db",
+        "--service-account=cloudrunsrvacct@service-22266004444@serverless-robot-prod.iam.gserviceaccount.com",
       ]
 
   - id: "create google cloud infrastructure"
     name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     args:
-        - sh
-        - -c
-        - |
-            echo "create domain name mapping ..."
+      - sh
+      - -c
+      - |
+        echo "create domain name mapping ..."
 
-            gcloud beta run domain-mappings create \
-                --domain $_MY_DOMAIN \
-                --service api-master \
-                --platform managed \
-                --region us-central1 || true
+        gcloud beta run domain-mappings create \
+            --domain $_MY_DOMAIN \
+            --service api-master \
+            --platform managed \
+            --region us-central1 || true
 
-            echo "create google cloud scheduler job ..."
+        echo "create google cloud scheduler job ..."
 
-            gcloud scheduler jobs create http ping \
-                --schedule="* * * * *" \
-                --uri="https://$_MY_DOMAIN/healthcheck" \
-                --http-method=GET || true
+        gcloud scheduler jobs create http ping \
+            --schedule="* * * * *" \
+            --uri="https://$_MY_DOMAIN/healthcheck" \
+            --http-method=GET || true
 
-            echo "create iam binding for pubsub ..."
+        echo "create iam binding for pubsub ..."
 
-            gcloud projects add-iam-policy-binding $PROJECT_ID \
-                --member="serviceAccount:$_SERVICE_ACCOUNT_ADDRESS"\
-                --role='roles/iam.serviceAccountTokenCreator'
+        gcloud projects add-iam-policy-binding $PROJECT_ID \
+            --member="serviceAccount:$_SERVICE_ACCOUNT_ADDRESS"\
+            --role='roles/iam.serviceAccountTokenCreator'
 
-            echo "creating topics and subscriptions ..."
+        echo "creating topics and subscriptions ..."
 
-            gcloud pubsub topics create apipub || true
+        gcloud pubsub topics create apipub || true
 
-            gcloud pubsub subscriptions create apisub \
-                --topic apipub \
-                --topic-project $PROJECT_ID \
-                --push-endpoint https://$_MY_DOMAIN/pubsub/receive_message \
-                --push-auth-service-account $_SERVICE_ACCOUNT_ADDRESS \
-                --expiration-period=never || true
+        gcloud pubsub subscriptions create apisub \
+            --topic apipub \
+            --topic-project $PROJECT_ID \
+            --push-endpoint https://$_MY_DOMAIN/pubsub/receive_message \
+            --push-auth-service-account $_SERVICE_ACCOUNT_ADDRESS \
+            --expiration-period=never || true
