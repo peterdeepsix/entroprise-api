@@ -1,18 +1,3 @@
-# cloudrun-fastapi Docs
-
-- [Local Development](#local-development)
-- [Secrets Manager](#secrets-manager)
-- [Testing Locally](#testing-locally)
-- [Working with Postgres](#working-with-postgres)
-- [Docker and Google Container Registry](#docker-and-google-container-registry)
-- [Cloud Build, Deployment, running a live Cloud Run service](#cloudbuild-deployment-running-a-live-cloud-run-service)
-- [DNS Setup with Managed Domain Mappings](#dns-setup-with-managed-domain-mappings)
-- [Google Cloud Scheduler Integration](google-cloud-scheduler-Integration)
-- [Google Cloud Pub Sub Integration](google-cloud-pub-sub-integration)
-
-Future Features:
-- Login With Google & Other OAuth Proviers <!-- https://medium.com/data-rebels/fastapi-google-as-an-external-authentication-provider-3a527672cf33 -->
-
 #### Local Development
 
 ```sh
@@ -22,6 +7,12 @@ uvicorn main:api --reload
 # running with gunicorn, recommended for production
 gunicorn main:api -c gunicorn_config.py
 ```
+
+#### Cloud SQL Proxy
+
+docker pull gcr.io/cloudsql-docker/gce-proxy:latest
+
+docker run -d -v ./creds -p 127.0.0.1:5432:5432 gcr.io/cloudsql-docker/gce-proxy:latest /cloud_sql_proxy -instances=entroprise-production:us-central1:entroprise-db=tcp:0.0.0.0:5432 -credential_file=/creds/service-account.json
 
 #### Secrets Manager
 
@@ -56,7 +47,7 @@ PYTHONPATH=. alembic history -vvv
 To create your migrations on a cloudsql instance:
 
 ```sh
-cloud_sql_proxy -instances=PROJECT_ID:REGION:INSTANCE_NAME -dir=/tmp/cloudsql
+cloud_sql_proxy -instances=entroprise-production:us-central1:entroprise-db -dir=/tmp/cloudsql
 # then run the commands as listed above
 ```
 
@@ -80,16 +71,14 @@ docker push us.gcr.io/$PROJECT_ID/cloud_run_fastapi
 
 To deploy this API to Cloud Run, you will need to have the following
 
-- [Create GitHub app triggers](https://cloud.google.com/cloud-build/docs/automating-builds/create-github-app-triggers) which will trigger the build process as noted in `cloudbuild.yaml`.
-- Have a PostgreSQL instance created in GCP that you will use for the service. There is no demo instance created as there is no free tier for Cloud SQL PSQL 😔. This instance will have to be referenced in the Cloud Run deployment in the `--set-cloudsql-instances` argument which is specified with a sample value in the `cloudbuild.yaml` template.
-- Additionally, replace the service account value with the appropriate service account address for the `--service-account` parameter in the cloud run deploy command in `cloudbuild.yaml`
-
+-   [Create GitHub app triggers](https://cloud.google.com/cloud-build/docs/automating-builds/create-github-app-triggers) which will trigger the build process as noted in `cloudbuild.yaml`.
+-   Have a PostgreSQL instance created in GCP that you will use for the service. There is no demo instance created as there is no free tier for Cloud SQL PSQL 😔. This instance will have to be referenced in the Cloud Run deployment in the `--set-cloudsql-instances` argument which is specified with a sample value in the `cloudbuild.yaml` template.
+-   Additionally, replace the service account value with the appropriate service account address for the `--service-account` parameter in the cloud run deploy command in `cloudbuild.yaml`
 
 #### DNS Setup with Managed Domain Mappings
 
 In `cloudbuild.yaml` there is a step called `"create google cloud infrastructure"` which shows how to create a domain name mapping for a cloud run service.
 You will have to place a substitution variable in the cloud build trigger for your api (`_MY_DOMAIN` as mentioned in `cloudbuild.yaml`).
-
 
 #### Google Cloud Scheduler Integration
 

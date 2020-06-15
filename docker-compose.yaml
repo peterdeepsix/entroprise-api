@@ -1,0 +1,13 @@
+version: "3"
+
+services:
+  cloud-sql-proxy:
+    image: gcr.io/cloudsql-docker/gce-proxy:latest
+    command: /cloud_sql_proxy -instances=entroprise-production:us-central1:entroprise-db=tcp:0.0.0.0:5432 -credential_file=/config/credentials.json
+    volumes:
+      # this mounts your application default credential on the container, preventing the
+      # 'invalid json file "/config": google: read JWT from JSON credentials: 'type' field is "authorized_user" (expected "service_account")'
+      # error if you point to the actual credential file directly
+      - ./credentials.json:/config/credentials.json
+    ports:
+      - 5432:5432
