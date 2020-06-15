@@ -15,7 +15,7 @@ steps:
         "run",
         "deploy",
         "api-$BRANCH_NAME",
-        "--image=us.gcr.io/$PROJECT_ID/api:latest",
+        "--image=us.gcr.io/$PROJECT_ID/cloudrunfastapi:latest",
         "--cpu=2",
         "--port=80",
         "--memory=2048Mi",
