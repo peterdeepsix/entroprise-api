@@ -1,33 +1,15 @@
-# flask app with ktrain and BERT
+# cloudrun-fastapi [![Awesome](https://awesome.re/badge.svg)](https://github.com/steren/awesome-cloudrun/blob/master/README.md#popular-stacks)
 
-# git
-git config --global user.email "peter@deepsixdesign.com"
-git config --global user.name "Peter Arnold"
+Boilerplate for running [FastAPI](https://fastapi.tiangolo.com/) on [Google Cloud Run](https://cloud.google.com/run) with [Google Cloud Build](https://cloud.google.com/cloud-build) for deployment.
 
-# create venv on windows
+For all documentation visit the [docs](./docs) folder.
 
-py -m venv venv
+### Contributions & Suggestions
 
-# activate on windows
+[Pull requests](https://github.com/anthcor/cloudrun-fastapi/compare) and [issues](https://github.com/anthcor/cloudrun-fastapi/issues/new) are very welcome!
 
-Set-ExecutionPolicy Unrestricted -Force
+---
 
-.\venv\Scripts\activate
+### Authors
 
-# deactivate
-
-deactivate
-
-# upgrade pip then install deps
-
-python -m pip install --upgrade pip
-
-pip install -r requirements.txt
-
-# setup google cloud service account creds
-
-$env:GOOGLE_APPLICATION_CREDENTIALS="D:\GitHub\CodeArena\entroprise-api\service-account-file.json"
-
-# run flask app
-
-flask run
+- [Anthony Corletti](https://github.com/anthcor)

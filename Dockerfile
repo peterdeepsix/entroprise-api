@@ -1,9 +1,10 @@
-# Dockerfile
-FROM python:3.7-stretch
-RUN apt-get update -y
-RUN apt-get install -y python-pip python-dev build-essential
-COPY . /app
+FROM python:3.8.2-slim
+
 WORKDIR /app
-RUN pip install -r requirements.txt
-ENTRYPOINT ["python"]
-CMD ["app.py"]
+COPY . /app
+
+RUN apt-get update -y \
+    && apt-get install -y gcc libpq-dev \
+    && pip3 install -r requirements.txt --no-cache-dir
+
+CMD gunicorn main:api -c gunicorn_config.py
