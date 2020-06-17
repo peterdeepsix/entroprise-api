@@ -1,11 +1,15 @@
+# key
+
+dd74decc-8825-4a49-b9bc-e4608249d612
+
 #### Local Development
 
 ```sh
 pip3 install -r requirements.txt
 # running with uvicorn, recommended for development
-uvicorn main:api --reload
+uvicorn main:app --reload
 # running with gunicorn, recommended for production
-gunicorn main:api -c gunicorn_config.py
+gunicorn main:app -c gunicorn_config.py
 ```
 
 #### Cloud SQL Proxy
@@ -71,9 +75,9 @@ docker push us.gcr.io/$PROJECT_ID/cloud_run_fastapi
 
 To deploy this API to Cloud Run, you will need to have the following
 
--   [Create GitHub app triggers](https://cloud.google.com/cloud-build/docs/automating-builds/create-github-app-triggers) which will trigger the build process as noted in `cloudbuild.yaml`.
--   Have a PostgreSQL instance created in GCP that you will use for the service. There is no demo instance created as there is no free tier for Cloud SQL PSQL 😔. This instance will have to be referenced in the Cloud Run deployment in the `--set-cloudsql-instances` argument which is specified with a sample value in the `cloudbuild.yaml` template.
--   Additionally, replace the service account value with the appropriate service account address for the `--service-account` parameter in the cloud run deploy command in `cloudbuild.yaml`
+- [Create GitHub app triggers](https://cloud.google.com/cloud-build/docs/automating-builds/create-github-app-triggers) which will trigger the build process as noted in `cloudbuild.yaml`.
+- Have a PostgreSQL instance created in GCP that you will use for the service. There is no demo instance created as there is no free tier for Cloud SQL PSQL 😔. This instance will have to be referenced in the Cloud Run deployment in the `--set-cloudsql-instances` argument which is specified with a sample value in the `cloudbuild.yaml` template.
+- Additionally, replace the service account value with the appropriate service account address for the `--service-account` parameter in the cloud run deploy command in `cloudbuild.yaml`
 
 #### DNS Setup with Managed Domain Mappings
 

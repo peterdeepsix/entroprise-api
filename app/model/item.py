@@ -5,7 +5,7 @@ from model.doc_model_base import DocModelBase
 
 
 class ItemBaseInDB(DocModelBase):
-    __table_name__ = "root/items/items"
+    __table_name__ = "root_collection/root_document/items"
 
 
 class Item(ItemBaseInDB):
@@ -14,6 +14,8 @@ class Item(ItemBaseInDB):
     content: str
     question: str
     confidence: int
+    correct_answers: list = []
+    incorrect_answers: list = []
     createdate: datetime
     lastupdate: datetime = None
 
@@ -24,6 +26,8 @@ class ItemCreate(ItemBaseInDB):
     content: str
     question: str
     confidence: int
+    correct_answers: list = []
+    incorrect_answers: list = []
     createdate: datetime = datetime.utcnow()
 
 
@@ -32,4 +36,6 @@ class ItemUpdate(ItemBaseInDB):
     content: str
     question: str
     confidence: int
+    correct_answers: list = []
+    incorrect_answers: list = []
     lastupdate: datetime = datetime.utcnow()
