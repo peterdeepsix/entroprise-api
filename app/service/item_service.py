@@ -22,3 +22,9 @@ def delete_item(item_id: str):
 
 def read_item(item_id: str):
     return db.query(model=Item).get(doc_id=item_id)
+
+def answer_question(context: str, question: str):
+    print(context)
+    print(question)
+    answer = "test answer"
+    return answer
