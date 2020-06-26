@@ -6,7 +6,7 @@ dd74decc-8825-4a49-b9bc-e4608249d612
 
 py -3 -m venv entroprise-api
 
-entroprise-api\Scripts\activate
+Scripts\activate
 
 pip3 install -r requirements.txt
 
