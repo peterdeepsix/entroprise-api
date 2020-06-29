@@ -121,11 +121,13 @@ def answer_question(item: Item):
         "roberta", "roberta-base", args=model_args
     )
 
-    # Train the model
-    model.train_model(train_data, eval_data=eval_data)
+# tokenizer.pad_token = tokenizer.eos_token 
 
-    # Evaluate the model
-    result, texts = model.eval_model(eval_data)
+    # # Train the model
+    # model.train_model(train_data, eval_data=eval_data)
+
+    # # Evaluate the model
+    # result, texts = model.eval_model(eval_data)
 
     # Make predictions with the model
     to_predict = [
@@ -140,5 +142,5 @@ def answer_question(item: Item):
         }
     ]
 
-    answers = model.predict(to_predict)
-    return preds
+    # answers = model.predict(to_predict)
+    return item
