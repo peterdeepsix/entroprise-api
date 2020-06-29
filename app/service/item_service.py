@@ -3,7 +3,7 @@ from models.item_model import Item
 import logging
 
 import pandas as pd
-from simpletransformers.question_answering import QuestionAnsweringModel, QuestionAnsweringArgs
+from simpletransformers.t5 import T5Model, T5Args
 
 def answer_question(item: Item):
     print(item)
@@ -13,134 +13,45 @@ def answer_question(item: Item):
     transformers_logger.setLevel(logging.WARNING)
 
     train_data = [
-        {
-            "context": "Mistborn is a series of epic fantasy novels written by American author Brandon Sanderson.",
-            "qas": [
-                {
-                    "id": "00001",
-                    "is_impossible": False,
-                    "question": "Who is the author of the Mistborn series?",
-                    "answers": [
-                        {
-                            "text": "Brandon Sanderson",
-                            "answer_start": 71,
-                        }
-                    ],
-                }
-            ],
-        },
-        {
-            "context": "The first series, published between 2006 and 2008, consists of The Final Empire,"
-                    "The Well of Ascension, and The Hero of Ages.",
-            "qas": [
-                {
-                    "id": "00002",
-                    "is_impossible": False,
-                    "question": "When was the series published?",
-                    "answers": [
-                        {
-                            "text": "between 2006 and 2008",
-                            "answer_start": 28,
-                        }
-                    ],
-                },
-                {
-                    "id": "00003",
-                    "is_impossible": False,
-                    "question": "What are the three books in the series?",
-                    "answers": [
-                        {
-                            "text": "The Final Empire, The Well of Ascension, and The Hero of Ages",
-                            "answer_start": 63,
-                        }
-                    ],
-                },
-                {
-                    "id": "00004",
-                    "is_impossible": True,
-                    "question": "Who is the main character in the series?",
-                    "answers": [],
-                },
-            ],
-        },
+        ["binary classification", "Anakin was Luke's father" , 1],
+        ["binary classification", "Luke was a Sith Lord" , 0],
+        ["generate question", "Star Wars is an American epic space-opera media franchise created by George Lucas, which began with the eponymous 1977 film and quickly became a worldwide pop-culture phenomenon", "Who created the Star Wars franchise?"],
+        ["generate question", "Anakin was Luke's father" , "Who was Luke's father?"],
     ]
+    train_df = pd.DataFrame(train_data)
+    train_df.columns = ["prefix", "input_text", "target_text"]
 
     eval_data = [
-        {
-            "context": "The series primarily takes place in a region called the Final Empire "
-                    "on a world called Scadrial, where the sun and sky are red, vegetation is brown, "
-                    "and the ground is constantly being covered under black volcanic ashfalls.",
-            "qas": [
-                {
-                    "id": "00001",
-                    "is_impossible": False,
-                    "question": "Where does the series take place?",
-                    "answers": [
-                        {
-                            "text": "region called the Final Empire",
-                            "answer_start": 38,
-                        },
-                        {
-                            "text": "world called Scadrial",
-                            "answer_start": 74,
-                        },
-                    ],
-                }
-            ],
-        },
-        {
-            "context": "\"Mistings\" have only one of the many Allomantic powers, while \"Mistborns\" have all the powers.",
-            "qas": [
-                {
-                    "id": "00002",
-                    "is_impossible": False,
-                    "question": "How many powers does a Misting possess?",
-                    "answers": [
-                        {
-                            "text": "one",
-                            "answer_start": 21,
-                        }
-                    ],
-                },
-                {
-                    "id": "00003",
-                    "is_impossible": True,
-                    "question": "What are Allomantic powers?",
-                    "answers": [],
-                },
-            ],
-        },
+        ["binary classification", "Leia was Luke's sister" , 1],
+        ["binary classification", "Han was a Sith Lord" , 0],
+        ["generate question", "In 2020, the Star Wars franchise's total value was estimated at US$70 billion, and it is currently the fifth-highest-grossing media franchise of all time.", "What is the total value of the Star Wars franchise?"],
+        ["generate question", "Leia was Luke's sister" , "Who was Luke's sister?"],
     ]
+    eval_df = pd.DataFrame(eval_data)
+    eval_df.columns = ["prefix", "input_text", "target_text"]
 
     # Configure the model
-    model_args = QuestionAnsweringArgs()
-    model_args.train_batch_size = 16
+    model_args = T5Args()
+    model_args.num_train_epochs = 200
+    model_args.no_save = True
+    model_args.evaluate_generated_text = True
     model_args.evaluate_during_training = True
+    model_args.evaluate_during_training_verbose = True
 
-    model = QuestionAnsweringModel(
-        "roberta", "roberta-base", args=model_args
-    )
-
-# tokenizer.pad_token = tokenizer.eos_token 
+    model = T5Model("t5-base", args=model_args)
 
     # # Train the model
-    # model.train_model(train_data, eval_data=eval_data)
+    # model.train_model(train_df, eval_data=eval_df)
 
-    # # Evaluate the model
-    # result, texts = model.eval_model(eval_data)
+    # # # Evaluate the model
+    # result = model.eval_model(eval_df)
 
     # Make predictions with the model
     to_predict = [
-        {
-            "context": "Vin is a Mistborn of great power and skill.",
-            "qas": [
-                {
-                    "question": "What is Vin's speciality?",
-                    "id": "0",
-                }
-            ],
-        }
+        "binary classification: Luke did not want to blow up the first Death Star",
+        "generate question: In 1971, George Lucas wanted to film an adaptation of the Flash Gordon serial, but could not obtain the rights, so he began developing his own space opera.",
     ]
 
-    # answers = model.predict(to_predict)
-    return item
+    preds = model.predict(to_predict)
+    
+    return preds
