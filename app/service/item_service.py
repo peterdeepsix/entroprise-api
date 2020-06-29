@@ -40,7 +40,7 @@ def answer_question(item: Item):
 
     model = T5Model("t5-base", args=model_args)
 
-    # # Train the model
+    # Train the model
     # model.train_model(train_df, eval_data=eval_df)
 
     # # # Evaluate the model
