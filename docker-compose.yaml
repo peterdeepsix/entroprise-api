@@ -2,14 +2,8 @@ version: "3"
 
 services:
   api:
-    # environment:
-    #   RACK_ENV: development
     build:
       context: .
-      dockerfile: Dockerfile-dev
-      args:
-        buildno: 1
-    volumes:
-      - ./credentials.json:/config/credentials-firebase.json
+      dockerfile: Dockerfile
     ports:
       - 80:80
