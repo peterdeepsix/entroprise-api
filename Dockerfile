@@ -1,14 +1,19 @@
-FROM tiangolo/uvicorn-gunicorn-fastapi:python3.7
+FROM tiangolo/uvicorn-gunicorn-machine-learning:python3.7
 
-# Install Poetry
-RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | POETRY_HOME=/opt/poetry python && \
-    cd /usr/local/bin && \
-    ln -s /opt/poetry/bin/poetry && \
-    poetry config virtualenvs.create false
+ENV TIMEOUT 1000
 
-# Copy using poetry.lock* in case it doesn't exist yet
-COPY ./pyproject.toml ./poetry.lock* /app/
+ENV GRACEFUL_TIMEOUT 1000
 
-RUN poetry install --no-root --no-dev
+RUN conda install -c conda-forge fastapi
+
+RUN conda install pandas tqdm
+
+RUN conda install pytorch cudatoolkit=10.1 -c pytorch
+
+RUN git clone https://github.com/NVIDIA/apex
+
+RUN pip install -v --no-cache-dir ./apex
+
+RUN pip install simpletransformers
 
 COPY ./app /app

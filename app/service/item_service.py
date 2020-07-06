@@ -3,55 +3,83 @@ from models.item_model import Item
 import logging
 
 import pandas as pd
-from simpletransformers.t5 import T5Model, T5Args
+from simpletransformers.question_answering import QuestionAnsweringModel, QuestionAnsweringArgs
 
 def answer_question(item: Item):
     print(item)
 
-    logging.basicConfig(level=logging.INFO)
-    transformers_logger = logging.getLogger("transformers")
-    transformers_logger.setLevel(logging.WARNING)
-
     train_data = [
-        ["binary classification", "Anakin was Luke's father" , 1],
-        ["binary classification", "Luke was a Sith Lord" , 0],
-        ["generate question", "Star Wars is an American epic space-opera media franchise created by George Lucas, which began with the eponymous 1977 film and quickly became a worldwide pop-culture phenomenon", "Who created the Star Wars franchise?"],
-        ["generate question", "Anakin was Luke's father" , "Who was Luke's father?"],
+        {
+            "context": "Super Bowl 50 was an American football game to determine the champion of the National Football League (NFL) for the 2015 season. The American Football Conference (AFC) champion Denver Broncos defeated the National Football Conference (NFC) champion Carolina Panthers 24–10 to earn their third Super Bowl title. The game was played on February 7, 2016, at Levis Stadium in the San Francisco Bay Area at Santa Clara, California. As this was the 50th Super Bowl, the league emphasized the golden anniversary with various gold-themed initiatives, as well as temporarily suspending the tradition of naming each Super Bowl game with Roman numerals (under which the game would have been known as Super Bowl L), so that the logo could prominently feature the Arabic numerals 50.",
+            "qas": [
+                {
+                    "id": "00001",
+                    "is_impossible": False,
+                    "question": "Who is the new champion?",
+                    "answers": [  {
+                            "text": "Denver Broncos",
+                            "answer_start": 178,
+                        }],
+                },
+                {
+                    "id": "00002",
+                    "is_impossible": False,
+                    "question": "What year was Super Bowl 50?",
+                    "answers": [  {
+                            "text": "2016",
+                            "answer_start": 347,
+                        }],
+                },
+            ],
+        },
     ]
-    train_df = pd.DataFrame(train_data)
-    train_df.columns = ["prefix", "input_text", "target_text"]
 
     eval_data = [
-        ["binary classification", "Leia was Luke's sister" , 1],
-        ["binary classification", "Han was a Sith Lord" , 0],
-        ["generate question", "In 2020, the Star Wars franchise's total value was estimated at US$70 billion, and it is currently the fifth-highest-grossing media franchise of all time.", "What is the total value of the Star Wars franchise?"],
-        ["generate question", "Leia was Luke's sister" , "Who was Luke's sister?"],
-    ]
-    eval_df = pd.DataFrame(eval_data)
-    eval_df.columns = ["prefix", "input_text", "target_text"]
-
-    # Configure the model
-    model_args = T5Args()
-    model_args.num_train_epochs = 200
-    model_args.no_save = True
-    model_args.evaluate_generated_text = True
-    model_args.evaluate_during_training = True
-    model_args.evaluate_during_training_verbose = True
-
-    model = T5Model("t5-base", args=model_args)
-
-    # Train the model
-    # model.train_model(train_df, eval_data=eval_df)
-
-    # # # Evaluate the model
-    # result = model.eval_model(eval_df)
-
-    # Make predictions with the model
-    to_predict = [
-        "binary classification: Luke did not want to blow up the first Death Star",
-        "generate question: In 1971, George Lucas wanted to film an adaptation of the Flash Gordon serial, but could not obtain the rights, so he began developing his own space opera.",
+        {
+            "context": "Super Bowl 50 was an American football game to determine the champion of the National Football League (NFL) for the 2015 season. The American Football Conference (AFC) champion Denver Broncos defeated the National Football Conference (NFC) champion Carolina Panthers 24–10 to earn their third Super Bowl title. The game was played on February 7, 2016, at Levis Stadium in the San Francisco Bay Area at Santa Clara, California. As this was the 50th Super Bowl, the league emphasized the golden anniversary with various gold-themed initiatives, as well as temporarily suspending the tradition of naming each Super Bowl game with Roman numerals (under which the game would have been known as Super Bowl L), so that the logo could prominently feature the Arabic numerals 50.",
+            "qas": [
+                {
+                    "id": "00001",
+                    "is_impossible": False,
+                    "question": "Who is the new champion?",
+                    "answers": [  {
+                            "text": "Denver Broncos",
+                            "answer_start": 178,
+                        }],
+                },
+                {
+                    "id": "00002",
+                    "is_impossible": False,
+                    "question": "What year was Super Bowl 50?",
+                    "answers": [  {
+                            "text": "2016",
+                            "answer_start": 347,
+                        }],
+                },
+            ],
+        },
     ]
 
-    preds = model.predict(to_predict)
+    # define model args
+    model_args = QuestionAnsweringArgs()
+    model_args.num_train_epochs = 5
+    model_args.reprocess_input_data = True
+    model_args.overwrite_output_dir = True
+    # model_args.use_early_stopping = True
+    # model_args.early_stopping_delta = 0.01
+    # model_args.early_stopping_metric = "mcc"
+    # model_args.early_stopping_metric_minimize = False
+    # model_args.early_stopping_patience = 5
+    # model_args.evaluate_during_training_steps = 1000
+
+    # Create the QuestionAnsweringModel
+    model = QuestionAnsweringModel('distilbert', 'distilbert-base-uncased-distilled-squad', args=model_args, use_cuda=False)
+
+    # model.train_model(train_data, eval_data=eval_data)
+
+    # Making predictions using the model.
+    to_predict = [{'context': item.context, 'qas': [{'question': item.question, 'id': '0'}]}]
+
+    results = model.predict(to_predict)
     
-    return preds
+    return results
